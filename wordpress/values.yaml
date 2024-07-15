@@ -1,0 +1,22 @@
+replicaCount: 1
+
+namespace:
+  name: wordpress
+
+image:
+  repository: wordpress
+  tag: "6.2.1-apache"
+  pullPolicy: IfNotPresent
+
+wordpress:
+  dbHost: mysql
+  dbUser: wordpress
+  dbPasswordSecret:
+    name: mysql-secret
+    key: mysql-user
+
+service:
+  type: NodePort
+  port: 80
+  selector:
+    app: wordpress

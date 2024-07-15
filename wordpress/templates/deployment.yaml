@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    app: wordpress
+spec:
+  selector:
+    matchLabels:
+      app: wordpress
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+      - image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        name: wordpress
+        env:
+        - name: WORDPRESS_DB_HOST
+          value: {{ .Values.wordpress.dbHost }}
+        - name: WORDPRESS_DB_NAME
+          value: wordpress 
+        - name: WORDPRESS_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.wordpress.dbPasswordSecret.name }}
+              key: {{ .Values.wordpress.dbPasswordSecret.key }}
+        - name: WORDPRESS_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.wordpress.dbPasswordSecret.name }}
+              key: mysql-password
+        ports:
+        - containerPort: {{ .Values.service.port }}
+          name: wordpress
+        volumeMounts:
+        - name: wordpress-persistent-storage
+          mountPath: /var/www/html
+      volumes:
+      - name: wordpress-persistent-storage
+        hostPath:
+          path: /data/wordpress
