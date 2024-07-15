@@ -8,5 +8,5 @@ spec:
   - port: {{ .Values.service.port}}
   selector:
     app:  {{ .Values.service.selector.app}}
-  # type: {{ .Values.service.type}}
-  clusterIP: None
+  type: {{ .Values.service.type}}
+  # clusterIP: None
